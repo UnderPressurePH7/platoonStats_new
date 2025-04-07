@@ -68,11 +68,11 @@ export default class SquadWidget {
         const data = await response.json();
         
         if (data.status === 'ok') {
-            console.log("Сервер активний та готовий до роботи", {
-                timestamp: data.timestamp,
-                database: data.database,
-                uptime: data.uptime
-            });
+            // console.log("Сервер активний та готовий до роботи", {
+            //     timestamp: data.timestamp,
+            //     database: data.database,
+            //     uptime: data.uptime
+            // });
             return true;
         } else {
             console.warn("Сервер повідомляє про проблеми:", data);
