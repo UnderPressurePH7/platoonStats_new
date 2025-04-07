@@ -322,7 +322,7 @@ class CoreService {
     try {
       if (!this.isSaving) return;
       await this.loadFromServer();
-      this.sleep(500);
+      this.sleep(300);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
     } catch (error) {
@@ -342,10 +342,10 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer();
-      this.sleep(500);
+      this.sleep(300);
       if (!this.isSaving) return;
       await this.loadFromServer();
-      this.sleep(500);
+      this.sleep(300);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
     } catch (error) {
