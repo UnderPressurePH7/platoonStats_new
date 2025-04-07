@@ -57,16 +57,14 @@ class CoreService {
     this.ws = new WebSocket(wsUrl);
 
     this.ws.onopen = () => {
-      console.log('WebSocket з\'єднання встановлено');
+
     };
 
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('Отримано WebSocket повідомлення:', data);
         if (data.success) {
           this.isSaving = true;
-          console.log('Дані успішно збережені на сервері');
         }
       } catch (error) {
         console.error('Помилка обробки WebSocket повідомлення:', error);
@@ -78,7 +76,7 @@ class CoreService {
     };
 
     this.ws.onclose = () => {
-      console.log('WebSocket з\'єднання закрито');
+      
     };
   }
 
