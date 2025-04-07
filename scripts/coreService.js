@@ -272,7 +272,7 @@ class CoreService {
   async serverDataLoad() {
     try {
       await this.loadFromServer();
-      this.sleep(500);
+      await this.sleep(500);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
     } catch (error) {
@@ -283,7 +283,7 @@ class CoreService {
   async serverDataSave() {
     try {
       this.saveState();
-      this.getRandomDelay();
+      await this.getRandomDelay();
       await this.saveToServer();
     } catch (error) {
       console.error('Error in serverDataSave:', error);
@@ -295,7 +295,7 @@ class CoreService {
       await this.saveToServer();
       await this.sleep(500);
       await this.loadFromServer();
-      this.sleep(500);
+      await this.sleep(500);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
     } catch (error) {
