@@ -159,7 +159,7 @@ class CoreService {
       .filter(key => !isNaN(key))
       .map(Number);
   }
-  
+
   calculatePlayerData(playerId) {
     let playerPoints = 0;
     let playerDamage = 0;
@@ -374,7 +374,7 @@ class CoreService {
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
     this.serverDataSave();
-    this.sleep(200);
+    this.sleep(300);
     this.serverDataLoad();
 
   }
@@ -399,7 +399,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
     this.serverDataSave();
-    this.sleep(200);
+    this.sleep(300);
     this.serverDataLoad();
   }
 
@@ -446,7 +446,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * GAME_POINTS.POINTS_PER_DAMAGE;
 
     this.serverDataSave();
-    this.sleep(200);
+    this.sleep(300);
     this.serverDataLoad();
   }
 
@@ -460,7 +460,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].points += GAME_POINTS.POINTS_PER_FRAG;
 
     this.serverDataSave();
-    this.sleep(200);
+    this.sleep(300);
     this.serverDataLoad();
   }
 
