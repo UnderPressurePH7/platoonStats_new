@@ -48,7 +48,7 @@ export default class SquadWidget {
         console.log("Перевірка статусу сервера...");
         
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 55000);
+        const timeoutId = setTimeout(() => controller.abort(), 175000);
         
         const response = await fetch(statusUrl, {
             method: 'GET',
