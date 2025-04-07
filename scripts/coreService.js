@@ -393,7 +393,8 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverDataSave();
+    
+    this.serverData();
   }
 
   handleOnAnyDamage(onDamageData) {
