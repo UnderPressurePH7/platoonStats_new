@@ -1,6 +1,6 @@
 import BattleDataManager from './battleDataManager.js';
 import BattleUIHandler from './battleUIHandler.js';
-import { STATS } from '../battle-history/scripts/constants.js';
+import { STATS } from './scripts/constants.js';
 
 class MainHistory {
     constructor() {
