@@ -49,8 +49,7 @@ class BattleDataManager {
     let battlePoints = 0;
     let battleDamage = 0;
     let battleKills = 0;
-
-    // Додаємо бонусні очки за перемогу команди
+    
     if (battle.win === 1) {
       battlePoints += GAME_POINTS.POINTS_PER_TEAM_WIN;
     }
@@ -90,7 +89,9 @@ class BattleDataManager {
 
     for (const arenaId in this.BattleStats) {
       battles++;
-      if (this.BattleStats[arenaId].win === 1) { teamPoints += GAME_POINTS.POINTS_PER_TEAM_WIN; wins++; }
+      if (this.BattleStats[arenaId].win === 1) { 
+        teamPoints += GAME_POINTS.POINTS_PER_TEAM_WIN; wins++; 
+      }
       for (const playerId in this.BattleStats[arenaId].players) {
         const player = this.BattleStats[arenaId].players[playerId];
         teamPoints += player.points;
