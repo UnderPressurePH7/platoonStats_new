@@ -371,7 +371,10 @@ class CoreService {
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-    this.serverData();
+    this.serverDataSave();
+    this.sleep(200);
+    this.serverDataLoad();
+
   }
 
   handleHangarVehicle(hangareVehicleData) {
@@ -393,7 +396,9 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverData();
+    this.serverDataSave();
+    this.sleep(200);
+    this.serverDataLoad();
   }
 
   handleOnAnyDamage(onDamageData) {
@@ -402,11 +407,8 @@ class CoreService {
 
     const playersID = this.getPlayersIds();
 
-    console.log("playersID ", playersID);
-    console.log("onDamageData.attacker.playerId", onDamageData.attacker.playerId);
-
     for (const playerId of playersID) {
-      if (onDamageData.attacker.playerId === playerId && playerId !== this.sdk.data.player.id.value) {
+      if (onDamageData.attacker.playerId === parseInt(playerId) && parseInt(playerId) !== this.sdk.data.player.id.value) {
         
         this.serverDataLoad();
         break;
@@ -441,7 +443,9 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * GAME_POINTS.POINTS_PER_DAMAGE;
 
-    this.serverData();
+    this.serverDataSave();
+    this.sleep(200);
+    this.serverDataLoad();
   }
 
   handlePlayerKill(killData) {
@@ -453,7 +457,9 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].kills += 1;
     this.BattleStats[arenaId].players[playerId].points += GAME_POINTS.POINTS_PER_FRAG;
 
-    this.serverData();
+    this.serverDataSave();
+    this.sleep(200);
+    this.serverDataLoad();
   }
 
   handlePlayerRadioAssist(radioAssist) {
