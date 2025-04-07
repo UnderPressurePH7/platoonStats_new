@@ -486,7 +486,8 @@ class CoreService {
     // this.curentPlayerId = Object.keys(result.avatars)[0];
     this.BattleStats[arenaId].duration = result.common.duration;
 
-    console.log("this.curentPlayerId", this.curentPlayerId);
+    console.log("this.curentPlayerId - ", this.curentPlayerId);
+    console.log("keys ", Object.keys(result.avatars)[0]);
 
     const playerTeam = Number(result.players[this.curentPlayerId].team);
     const winnerTeam = Number(result.common.winnerTeam);
