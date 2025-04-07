@@ -44,7 +44,7 @@ export default class SquadWidget {
 
   async warmupServer() {
     try {
-        const statusUrl = atob(STATS.STATUS);
+        const statusUrl = `${atob(STATS.STATUS)}`;
         console.log("Перевірка статусу сервера...");
         
         const controller = new AbortController();
