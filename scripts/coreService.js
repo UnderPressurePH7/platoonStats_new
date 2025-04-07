@@ -225,7 +225,7 @@ class CoreService {
     for (let i = 0; i < retries; i++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 500);
+        const timeoutId = setTimeout(() => controller.abort(), 1500);
 
         const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
           method: 'POST',
@@ -251,7 +251,7 @@ class CoreService {
       } catch (error) {
         console.error(`Attempt ${i + 1} failed:`, error);
         if (i === retries - 1) throw error;
-        await this.sleep(750 * (i + 1));
+        this.sleep(750 * (i + 1));
       }
     }
     return false;
@@ -323,7 +323,11 @@ class CoreService {
   async serverDataLoad() {
     try {
       if (!this.isSaving) return;
-      await this.loadFromServer();
+
+      const isLoaded = await this.loadFromServer();
+        if (!isLoaded) {
+            return false;
+        }
       this.sleep(30);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
@@ -334,8 +338,11 @@ class CoreService {
 
   async serverDataSave() {
     try {
-      this.getRandomDelay();
-      await this.saveToServer();
+
+      const isSaved =  await this.saveToServer();
+      if (!isSaved) {
+          return false;
+      }
     } catch (error) {
       console.error('Error in serverDataSave:', error);
     }
@@ -510,13 +517,28 @@ class CoreService {
       }
     }
 
-    const playerIds = this.getPlayersIds();
-    for (const playerId of playerIds) {
+    // const playerIds = this.getPlayersIds();
+    // for (const playerId of playerIds) {
+    //   for (const vehicleId in result.vehicles) {
+    //     const vehicles = result.vehicles[vehicleId];
+    //     for (const vehicle of vehicles) {
+    //       if (vehicle.accountDBID === playerId) {
+    //         const playerStats = this.BattleStats[arenaId].players[playerId];
+    //         playerStats.damage = vehicle.damageDealt;
+    //         playerStats.kills = vehicle.kills;
+    //         playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
+    //         break;
+    //       }
+    //     }
+    //   }
+    // }
+
+    // Рахувати тільки свої дані
       for (const vehicleId in result.vehicles) {
         const vehicles = result.vehicles[vehicleId];
         for (const vehicle of vehicles) {
-          if (vehicle.accountDBID === playerId) {
-            const playerStats = this.BattleStats[arenaId].players[playerId];
+          if (vehicle.accountDBID === this.curentPlayerId) {
+            const playerStats = this.BattleStats[arenaId].players[this.curentPlayerId];
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;
             playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
@@ -524,10 +546,11 @@ class CoreService {
           }
         }
       }
-    }
+    this.getRandomDelay();
     this.serverDataSave();
     this.sleep(1500);
     this.serverDataLoad();
+
   }
 
   cleanup() {
