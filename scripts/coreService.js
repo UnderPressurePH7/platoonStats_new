@@ -399,7 +399,6 @@ class CoreService {
   handleOnAnyDamage(onDamageData) {
     if (!onDamageData || !this.curentArenaId || !this.sdk.data.player.id.value) return;
 
-    console.log("any  -  Damage");
 
     const playersID = this.getPlayersIds();
     for (const playerId of playersID) {
@@ -431,7 +430,6 @@ class CoreService {
   handlePlayerDamage(damageData) {
     if (!damageData || !this.curentArenaId || !this.curentPlayerId) return;
 
-    console.log("handlePlayerDamage");
     const arenaId = this.curentArenaId;
     const playerId = this.curentPlayerId;
 
@@ -483,17 +481,11 @@ class CoreService {
     const arenaId = result.arenaUniqueID;
     if (!arenaId) return;
 
-    // this.curentPlayerId = Object.keys(result.avatars)[0];
+    this.curentPlayerId = result.personal.avatar.accountDBID;
     this.BattleStats[arenaId].duration = result.common.duration;
-
-    console.log("this.curentPlayerId - ", this.curentPlayerId);
-    console.log("keys ", Object.keys(result.avatars)[0]);
 
     const playerTeam = Number(result.players[this.curentPlayerId].team);
     const winnerTeam = Number(result.common.winnerTeam);
-
-    console.log("playerTeam", playerTeam);
-    console.log("winnerTeam", winnerTeam);
 
 
     if (playerTeam !== undefined && playerTeam !== 0 && winnerTeam !== undefined) {
