@@ -274,13 +274,21 @@ class CoreService {
     try {
       await this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
-      await this.sleep(500);
+      await this.sleep(200);
       this.saveState();
     } catch (error) {
-      console.error('Error in serverData:', error);
+      console.error('Error in serverDataLoad:', error);
     }
   }
 
+  async serverDataSave() {
+    try {
+      this.getRandomDelay();
+      await this.saveToServer();
+    } catch (error) {
+      console.error('Error in serverDataSave:', error);
+    }
+  }
 
   async serverData() {
     try {
@@ -288,7 +296,7 @@ class CoreService {
       await this.sleep(500);
       await this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
-      await this.sleep(500);
+      await this.sleep(200);
       this.saveState();
     } catch (error) {
       console.error('Error in serverData:', error);
@@ -342,8 +350,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.getRandomDelay();
-    this.saveToServer();
+    this.serverDataSave();
   }
 
   // ПОДІЯ НА НАНЕСЕННЯ ШКОДИ В КОЛІ ВІДМАЛЬВКИ
@@ -474,8 +481,7 @@ class CoreService {
         }
       }
     }
-    this.getRandomDelay();
-    this.saveToServer();
+    this.serverDataSave();
     this.sleep(1500);
     this.serverDataLoad;
   }
