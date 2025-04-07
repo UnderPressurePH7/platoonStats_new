@@ -19,19 +19,67 @@ class CoreService {
       this.curentArenaId = state.curentArenaId || null;
       this.curentVehicle = state.curentVehicle || null;
       this.isInPlatoon = state.isInPlatoon || false;
-
     } else {
-
       this.BattleStats = {};
       this.PlayersInfo = {};
       this.curentPlayerId = this.sdk.data.player.id.value;
       this.curentArenaId = null;
       this.curentVehicle = null;
+      this.isInPlatoon = false;
     }
 
+    this.isSaving = false;
     this.setupSDKListeners();
     this.eventsCore = new EventEmitter();
+    this.setupWebSocket();
     this.loadFromServer();
+
+
+    setInterval(() => {
+      if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
+        this.setupWebSocket();
+      }
+    }, 30000);
+  }
+
+  etupWebSocket() {
+    const accessKey = this.getAccessKey();
+    if (!accessKey || !this.curentPlayerId) return;
+
+    const baseUrl = atob(STATS.WS);
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${wsProtocol}//${baseUrl}?playerId=${this.curentPlayerId}`;
+
+    if (this.ws) {
+      this.ws.close();
+    }
+
+    this.ws = new WebSocket(wsUrl);
+
+    this.ws.onopen = () => {
+      console.log('WebSocket з\'єднання встановлено');
+    };
+
+    this.ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('Отримано WebSocket повідомлення:', data);
+        if (data.success) {
+          this.isSaving = true;
+          console.log('Дані успішно збережені на сервері');
+        }
+      } catch (error) {
+        console.error('Помилка обробки WebSocket повідомлення:', error);
+      }
+    };
+
+    this.ws.onerror = (error) => {
+      console.error('WebSocket помилка:', error);
+    };
+
+    this.ws.onclose = () => {
+      console.log('WebSocket з\'єднання закрито');
+    };
   }
 
   sleep(ms) {
@@ -41,8 +89,7 @@ class CoreService {
   getRandomDelay() {
     const min = 50;
     const max = 200;
-    const delay = Math.floor(Math.random() * (max - min + 5)) + min;
-    return this.sleep(delay);
+    return this.sleep(Math.floor(Math.random() * (max - min + 5)) + min);
   }
 
   setupSDKListeners() {
@@ -69,6 +116,9 @@ class CoreService {
 
   clearState() {
     localStorage.removeItem('gameState');
+    if (this.ws) {
+      this.ws.close();
+    }
 
     this.BattleStats = {};
     this.PlayersInfo = {};
@@ -76,8 +126,9 @@ class CoreService {
     this.curentArenaId = null;
     this.curentVehicle = null;
     this.isInPlatoon = false;
-  }
 
+    this.setupWebSocket();
+  }
 
   initializeBattleStats(arenaId, playerId) {
     if (!this.BattleStats[arenaId]) {
@@ -169,6 +220,8 @@ class CoreService {
       throw new Error('Access key not found');
     }
 
+    this.isSaving = false;
+
     for (let i = 0; i < retries; i++) {
       try {
         const controller = new AbortController();
@@ -193,13 +246,12 @@ class CoreService {
           throw new Error(`Server error: ${response.status}`);
         }
 
-
         return true;
 
       } catch (error) {
         console.error(`Attempt ${i + 1} failed:`, error);
         if (i === retries - 1) throw error;
-        await this.sleep(750 * (i + 1)); // Експоненціальна затримка
+        await this.sleep(750 * (i + 1));
       }
     }
     return false;
@@ -212,6 +264,9 @@ class CoreService {
       if (!accessKey) {
         throw new Error('Access key not found');
       }
+
+      if (!this.isSaving) return;
+
       const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
         method: 'GET',
         headers: {
@@ -232,7 +287,6 @@ class CoreService {
         if (data.PlayerInfo) {
           this.PlayersInfo = data.PlayerInfo;
         }
-
       }
       return true;
     } catch (error) {
@@ -240,7 +294,6 @@ class CoreService {
       throw error;
     }
   }
-
 
   async clearServerData() {
     try {
@@ -303,12 +356,8 @@ class CoreService {
     }
   }
 
-  // ОБРОБНИКИ ПОДІЙ В ГАРАЖІ
-
   handlePlatoonStatus(isInPlatoon) {
-
     this.isInPlatoon = isInPlatoon;
-
     this.saveState();
   }
 
@@ -325,7 +374,7 @@ class CoreService {
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-    this.serverData()
+    this.serverData();
   }
 
   handleHangarVehicle(hangareVehicleData) {
@@ -333,8 +382,6 @@ class CoreService {
     this.curentVehicle = hangareVehicleData.localizedShortName || 'Unknown Vehicle';
   }
 
-
-  // ОБРОБНИК ПОДІЙ АРЕНИ
   handleArena(arenaData) {
     if (!arenaData) return;
 
@@ -345,7 +392,6 @@ class CoreService {
 
     this.initializeBattleStats(this.curentArenaId, this.curentPlayerId);
 
-
     this.BattleStats[this.curentArenaId].mapName = arenaData.localizedName || 'Unknown Map';
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
@@ -353,7 +399,6 @@ class CoreService {
     this.serverDataSave();
   }
 
-  // ПОДІЯ НА НАНЕСЕННЯ ШКОДИ В КОЛІ ВІДМАЛЬВКИ
   handleOnAnyDamage(onDamageData) {
     if (!onDamageData || !this.curentArenaId || !this.sdk.data.player.id.value) return;
 
@@ -366,26 +411,30 @@ class CoreService {
     }
   }
 
-  // ОБРОБНИКИ ПОДІЙ ПОВ'ЯЗАНИХ ІЗ ДІЯМИ ГРАВЦЯ
   handlePlayerFeedback(feedback) {
     if (!feedback || !feedback.type) return;
 
-    if (feedback.type === 'damage') {
-      this.handlePlayerDamage(feedback.data);
-    } else if (feedback.type === 'kill') {
-      this.handlePlayerKill(feedback.data);
-    } else if (feedback.type === 'radioAssist') {
-      this.handlePlayerRadioAssist(feedback.data);
-    } else if (feedback.type === 'trackAssist') {
-      this.handlePlayerTrackAssist(feedback.data);
-    } else if (feedback.type === 'tanking') {
-      this.handlePlayerTanking(feedback.data);
-    } else if (feedback.type === 'receivedDamage') {
-      this.handlePlayerReceivedDamage(feedback.data);
+    switch (feedback.type) {
+      case 'damage':
+        this.handlePlayerDamage(feedback.data);
+        break;
+      case 'kill':
+        this.handlePlayerKill(feedback.data);
+        break;
+      case 'radioAssist':
+        this.handlePlayerRadioAssist(feedback.data);
+        break;
+      case 'trackAssist':
+        this.handlePlayerTrackAssist(feedback.data);
+        break;
+      case 'tanking':
+        this.handlePlayerTanking(feedback.data);
+        break;
+      case 'receivedDamage':
+        this.handlePlayerReceivedDamage(feedback.data);
+        break;
     }
   }
-
-
 
   handlePlayerDamage(damageData) {
     if (!damageData || !this.curentArenaId || !this.curentPlayerId) return;
@@ -411,33 +460,26 @@ class CoreService {
     this.serverData();
   }
 
-
   handlePlayerRadioAssist(radioAssist) {
     if (!radioAssist || !this.curentArenaId || !this.curentPlayerId) return;
-    // асист по розвідці
     this.serverDataLoad();
   }
 
-
   handlePlayerTrackAssist(trackAssist) {
     if (!trackAssist || !this.curentArenaId || !this.curentPlayerId) return;
-    // асист по гуслях
     this.serverDataLoad();
   }
 
   handlePlayerTanking(tanking) {
     if (!tanking || !this.curentArenaId || !this.curentPlayerId) return;
-    // заблоковано шкоди
     this.serverDataLoad();
   }
 
   handlePlayerReceivedDamage(receivedDamage) {
     if (!receivedDamage || !this.curentArenaId || !this.curentPlayerId) return;
-    // шкода завдана по гравцеві
     this.serverDataLoad();
   }
 
-  // РЕЗУЛЬТАТИ БОЮ  
   handleBattleResult(result) {
     if (!result || !result.vehicles || !result.players) {
       console.error("Invalid battle result data");
@@ -454,7 +496,6 @@ class CoreService {
     const winnerTeam = Number(result.common.winnerTeam);
 
     if (playerTeam !== undefined && playerTeam !== 0 && winnerTeam !== undefined) {
-
       if (playerTeam === winnerTeam) {
         this.BattleStats[arenaId].win = 1;
       } else if (winnerTeam === 0) {
@@ -474,8 +515,6 @@ class CoreService {
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;
             playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
-
-            // this.saveToServer(playerId); // помилка, сервер лягає
             break;
           }
         }
@@ -483,7 +522,13 @@ class CoreService {
     }
     this.serverDataSave();
     this.sleep(1500);
-    this.serverDataLoad;
+    this.serverDataLoad();
+  }
+
+  cleanup() {
+    if (this.ws) {
+      this.ws.close();
+    }
   }
 }
 
