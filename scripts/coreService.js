@@ -326,8 +326,6 @@ class CoreService {
   }
 
 
-
-
   // ОБРОБНИК ПОДІЙ АРЕНИ
   handleArena(arenaData) {
     if (!arenaData) return;
@@ -344,7 +342,8 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverData();
+    this.getRandomDelay();
+    this.saveToServer();
   }
 
   // ПОДІЯ НА НАНЕСЕННЯ ШКОДИ В КОЛІ ВІДМАЛЬВКИ
