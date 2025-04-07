@@ -342,7 +342,7 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer();
-      this.sleep(750);
+      this.sleep(500);
       if (!this.isSaving) return;
       await this.loadFromServer();
       this.sleep(30);
