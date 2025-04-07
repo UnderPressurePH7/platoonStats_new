@@ -29,35 +29,53 @@ class CoreService {
     }
 
     this.isSaving = false;
+    this.reconnectAttempts = 0;
+    this.baseDelay = 500;   
+    this.maxDelay = 1000;     
+
     this.setupSDKListeners();
     this.eventsCore = new EventEmitter();
     this.setupWebSocket();
     this.loadFromServer();
-
-
-    setInterval(() => {
-      if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
-        this.setupWebSocket();
-      }
-    }, 30000);
+    this.startWebSocketMonitoring();
   }
 
-    setupWebSocket() {
+  startWebSocketMonitoring() {
+    setInterval(() => {
+        if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
+            const delay = Math.min(
+                this.baseDelay * Math.pow(2, this.reconnectAttempts),
+                this.maxDelay
+            );
+            
+            setTimeout(() => {
+                this.setupWebSocket();
+                this.reconnectAttempts++;
+            }, delay);
+        } else {
+            this.reconnectAttempts = 0;
+        }
+    }, 5000);
+  }
+
+  setupWebSocket() {
     const accessKey = this.getAccessKey();
-    if (!accessKey || !this.curentPlayerId) return;
+    if (!accessKey || !this.curentPlayerId) {
+        return;
+    }
 
     const baseUrl = atob(STATS.WS);
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${wsProtocol}//${baseUrl}?playerId=${this.curentPlayerId}`;
 
     if (this.ws) {
-      this.ws.close();
+        this.ws.close();
     }
 
     this.ws = new WebSocket(wsUrl);
 
     this.ws.onopen = () => {
-
+        this.reconnectAttempts = 0; 
     };
 
     this.ws.onmessage = (event) => {
@@ -76,7 +94,7 @@ class CoreService {
     };
 
     this.ws.onclose = () => {
-      
+
     };
   }
 
@@ -418,7 +436,7 @@ class CoreService {
 
     for (const playerId of playersID) {
       if (onDamageData.attacker.playerId === parseInt(playerId) && parseInt(playerId) !== this.sdk.data.player.id.value) {
-        
+
         this.serverDataLoad();
         break;
       }
@@ -517,35 +535,19 @@ class CoreService {
       }
     }
 
-    // const playerIds = this.getPlayersIds();
-    // for (const playerId of playerIds) {
-    //   for (const vehicleId in result.vehicles) {
-    //     const vehicles = result.vehicles[vehicleId];
-    //     for (const vehicle of vehicles) {
-    //       if (vehicle.accountDBID === playerId) {
-    //         const playerStats = this.BattleStats[arenaId].players[playerId];
-    //         playerStats.damage = vehicle.damageDealt;
-    //         playerStats.kills = vehicle.kills;
-    //         playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
-    //         break;
-    //       }
-    //     }
-    //   }
-    // }
-
-    // Рахувати тільки свої дані
-      for (const vehicleId in result.vehicles) {
-        const vehicles = result.vehicles[vehicleId];
-        for (const vehicle of vehicles) {
-          if (vehicle.accountDBID === this.curentPlayerId) {
-            const playerStats = this.BattleStats[arenaId].players[this.curentPlayerId];
-            playerStats.damage = vehicle.damageDealt;
-            playerStats.kills = vehicle.kills;
-            playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
-            break;
-          }
+    for (const vehicleId in result.vehicles) {
+      const vehicles = result.vehicles[vehicleId];
+      for (const vehicle of vehicles) {
+        if (vehicle.accountDBID === this.curentPlayerId) {
+          const playerStats = this.BattleStats[arenaId].players[this.curentPlayerId];
+          playerStats.damage = vehicle.damageDealt;
+          playerStats.kills = vehicle.kills;
+          playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
+          break;
         }
       }
+    }
+
     this.getRandomDelay();
     this.serverDataSave();
     this.sleep(1500);
