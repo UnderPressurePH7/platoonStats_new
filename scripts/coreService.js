@@ -223,7 +223,7 @@ class CoreService {
     for (let i = 0; i < retries; i++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 500);
 
         const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
           method: 'POST',
@@ -342,7 +342,7 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer();
-      this.sleep(500);
+      this.sleep(750);
       if (!this.isSaving) return;
       await this.loadFromServer();
       this.sleep(200);
