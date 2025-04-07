@@ -477,7 +477,7 @@ class CoreService {
     }
     this.getRandomDelay();
     this.saveToServer();
-    this.sleep(500);
+    this.sleep(1500);
     this.serverDataLoad;
   }
 }
