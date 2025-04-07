@@ -393,7 +393,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverDataSave();
+    this.serverData();
   }
 
   handleOnAnyDamage(onDamageData) {
@@ -404,7 +404,7 @@ class CoreService {
 
     console.log("playersID ", playersID);
     console.log("onDamageData.attacker.playerId", onDamageData.attacker.playerId);
-    
+
     for (const playerId of playersID) {
       if (onDamageData.attacker.playerId === playerId && playerId !== this.sdk.data.player.id.value) {
         
