@@ -155,9 +155,11 @@ class CoreService {
   }
 
   getPlayersIds() {
-    return Object.keys(this.PlayersInfo || {});
+    return Object.keys(this.PlayersInfo || {})
+      .filter(key => !isNaN(key))
+      .map(Number);
   }
-
+  
   calculatePlayerData(playerId) {
     let playerPoints = 0;
     let playerDamage = 0;
