@@ -272,9 +272,8 @@ class CoreService {
   async serverDataLoad() {
     try {
       await this.loadFromServer();
-      this.sleep(100);
+      this.sleep(500);
       this.eventsCore.emit('statsUpdated');
-      await this.sleep(200);
       this.saveState();
     } catch (error) {
       console.error('Error in serverDataLoad:', error);
@@ -296,9 +295,8 @@ class CoreService {
       await this.saveToServer();
       await this.sleep(500);
       await this.loadFromServer();
-      this.sleep(100);
+      this.sleep(500);
       this.eventsCore.emit('statsUpdated');
-      await this.sleep(200);
       this.saveState();
     } catch (error) {
       console.error('Error in serverData:', error);
