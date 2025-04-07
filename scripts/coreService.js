@@ -86,7 +86,7 @@ class CoreService {
 
   getRandomDelay() {
     const min = 50;
-    const max = 200;
+    const max = 100;
     return this.sleep(Math.floor(Math.random() * (max - min + 5)) + min);
   }
 
@@ -322,7 +322,7 @@ class CoreService {
     try {
       if (!this.isSaving) return;
       await this.loadFromServer();
-      this.sleep(300);
+      this.sleep(200);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
     } catch (error) {
@@ -342,10 +342,10 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer();
-      this.sleep(300);
+      this.sleep(100);
       if (!this.isSaving) return;
       await this.loadFromServer();
-      this.sleep(300);
+      this.sleep(200);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
     } catch (error) {
@@ -393,8 +393,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    
-    this.serverData();
+    this.serverDataSave();
   }
 
   handleOnAnyDamage(onDamageData) {
