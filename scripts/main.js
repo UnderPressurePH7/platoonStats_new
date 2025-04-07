@@ -22,6 +22,7 @@ export default class SquadWidget {
       this.showAccessDenied();
     }
   }
+
   initializeServices() {
     try {
       this.coreService = new CoreService();
@@ -41,29 +42,54 @@ export default class SquadWidget {
     }
   }
 
-async warmupServer() {
-  try {
-    const warmupUrl = `${atob(STATS.BATTLE)}ping`;
-    console.log("Warming up server...");
-    
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
-    const response = await fetch(warmupUrl, {
-      method: 'GET',
-      signal: controller.signal
-    }).catch(err => {
-      console.log("Server warmup request failed, continuing anyway");
-      return null;
-    });
-    
-    clearTimeout(timeoutId);
-    console.log("Server warmed up");
-    
-    await new Promise(resolve => setTimeout(resolve, 500));
-  } catch (error) {
-    console.log("Error warming up server, continuing anyway:", error);
-  }
+  async warmupServer() {
+    try {
+        const statusUrl = atob(STATS.STATUS);
+        console.log("Перевірка статусу сервера...");
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(statusUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            console.warn("Сервер не відповідає належним чином");
+            return false;
+        }
+
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            console.log("Сервер активний та готовий до роботи", {
+                timestamp: data.timestamp,
+                database: data.database,
+                uptime: data.uptime
+            });
+            return true;
+        } else {
+            console.warn("Сервер повідомляє про проблеми:", data);
+            return false;
+        }
+
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.warn("Перевищено час очікування відповіді від сервера");
+        } else {
+            console.error("Помилка при перевірці статусу сервера:", error);
+        }
+        return false;
+    } finally {
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
 }
 
   async checkAccessKey() {
