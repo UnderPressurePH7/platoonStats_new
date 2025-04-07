@@ -1,5 +1,6 @@
 import CoreService from './coreService.js';
 import UIService from './uiService.js';
+import { STATS } from '../battle-history/scripts/constants.js';
 
 export default class SquadWidget {
   constructor() {
@@ -8,6 +9,8 @@ export default class SquadWidget {
 
   async init() {
     try {
+
+      await this.warmupServer();
       const hasAccess = await this.checkAccessKey();
       if (!hasAccess) {
         this.showAccessDenied();
@@ -38,6 +41,31 @@ export default class SquadWidget {
     }
   }
 
+async warmupServer() {
+  try {
+    const warmupUrl = `${atob(STATS.BATTLE)}ping`;
+    console.log("Warming up server...");
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
+    const response = await fetch(warmupUrl, {
+      method: 'GET',
+      signal: controller.signal
+    }).catch(err => {
+      console.log("Server warmup request failed, continuing anyway");
+      return null;
+    });
+    
+    clearTimeout(timeoutId);
+    console.log("Server warmed up");
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+  } catch (error) {
+    console.log("Error warming up server, continuing anyway:", error);
+  }
+}
+
   async checkAccessKey() {
     try {
       localStorage.removeItem('accessKey');
@@ -47,7 +75,7 @@ export default class SquadWidget {
         return false;
       }
   
-      const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/${urlParams}`;
+      const apiUrl = `${atob(STATS.BATTLE)}${urlParams}`;
   
       const response = await fetch(apiUrl, {
         method: 'GET',

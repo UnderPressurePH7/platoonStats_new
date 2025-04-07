@@ -1,5 +1,6 @@
 import BattleDataManager from './battleDataManager.js';
 import BattleUIHandler from './battleUIHandler.js';
+import { STATS } from '../battle-history/scripts/constants.js';
 
 class MainHistory {
     constructor() {
@@ -22,13 +23,10 @@ class MainHistory {
 
     initializeServices() {
         try {
-            // Створюємо екземпляр менеджера даних
             this.dataManager = new BattleDataManager();
 
-            // Створюємо екземпляр UI handler
             this.uiHandler = new BattleUIHandler(this.dataManager);
 
-            // Ініціалізуємо додаток
             this.initialize();
         } catch (error) {
             console.error('Error initializing services:', error);
@@ -38,10 +36,9 @@ class MainHistory {
 
     async initialize() {
         try {
-            // Завантажуємо дані з сервера
+
             await this.dataManager.loadFromServer();
 
-            // Оновлюємо інтерфейс
             this.uiHandler.initializeUI();
         } catch (error) {
             console.error('Error in initialize:', error);
@@ -58,7 +55,7 @@ class MainHistory {
             return false;
           }
       
-          const apiUrl = `https://node-server-under-0eb3b9aee4e3.herokuapp.com/api/battle-stats/${urlParams}`;
+          const apiUrl = `${atob(STATS.BATTLE)}${urlParams}`;
       
           const response = await fetch(apiUrl, {
             method: 'GET',
@@ -160,7 +157,6 @@ class MainHistory {
     }
 }
 
-// Створюємо екземпляр класу при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', () => {
     window.mainHistory = new MainHistory();
 });
