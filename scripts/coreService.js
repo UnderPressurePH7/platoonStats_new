@@ -42,7 +42,7 @@ class CoreService {
     }, 30000);
   }
 
-  etupWebSocket() {
+    setupWebSocket() {
     const accessKey = this.getAccessKey();
     if (!accessKey || !this.curentPlayerId) return;
 
