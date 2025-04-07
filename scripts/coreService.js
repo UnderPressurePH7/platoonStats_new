@@ -482,7 +482,8 @@ class CoreService {
       console.error("Invalid battle result data");
       return;
     }
-
+    
+    console.log("result", result);
     const arenaId = result.arenaUniqueID;
     if (!arenaId) return;
 
