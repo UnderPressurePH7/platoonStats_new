@@ -272,6 +272,7 @@ class CoreService {
   async serverDataLoad() {
     try {
       await this.loadFromServer();
+      this.sleep(100);
       this.eventsCore.emit('statsUpdated');
       await this.sleep(200);
       this.saveState();
@@ -282,6 +283,7 @@ class CoreService {
 
   async serverDataSave() {
     try {
+      this.saveState();
       this.getRandomDelay();
       await this.saveToServer();
     } catch (error) {
@@ -294,6 +296,7 @@ class CoreService {
       await this.saveToServer();
       await this.sleep(500);
       await this.loadFromServer();
+      this.sleep(100);
       this.eventsCore.emit('statsUpdated');
       await this.sleep(200);
       this.saveState();
@@ -473,7 +476,7 @@ class CoreService {
             playerStats.damage = vehicle.damageDealt;
             playerStats.kills = vehicle.kills;
             playerStats.points = vehicle.damageDealt + (vehicle.kills * GAME_POINTS.POINTS_PER_FRAG);
-            this.saveState();
+
             // this.saveToServer(playerId); // помилка, сервер лягає
             break;
           }
