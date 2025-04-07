@@ -401,8 +401,13 @@ class CoreService {
 
 
     const playersID = this.getPlayersIds();
+
+    console.log("playersID ", playersID);
+    console.log("onDamageData.attacker.playerId", onDamageData.attacker.playerId);
+    
     for (const playerId of playersID) {
       if (onDamageData.attacker.playerId === playerId && playerId !== this.sdk.data.player.id.value) {
+        
         this.serverDataLoad();
         break;
       }
