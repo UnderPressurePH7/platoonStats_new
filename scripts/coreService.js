@@ -265,8 +265,6 @@ class CoreService {
         throw new Error('Access key not found');
       }
 
-      if (!this.isSaving) return;
-
       const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
         method: 'GET',
         headers: {
@@ -324,6 +322,7 @@ class CoreService {
 
   async serverDataLoad() {
     try {
+      if (!this.isSaving) return;
       await this.loadFromServer();
       await this.sleep(500);
       this.eventsCore.emit('statsUpdated');
@@ -347,6 +346,7 @@ class CoreService {
     try {
       await this.saveToServer();
       await this.sleep(500);
+      if (!this.isSaving) return;
       await this.loadFromServer();
       await this.sleep(500);
       this.eventsCore.emit('statsUpdated');
