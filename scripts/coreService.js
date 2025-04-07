@@ -342,7 +342,7 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer();
-      this.sleep(100);
+      this.sleep(500);
       if (!this.isSaving) return;
       await this.loadFromServer();
       this.sleep(200);
@@ -399,6 +399,8 @@ class CoreService {
   handleOnAnyDamage(onDamageData) {
     if (!onDamageData || !this.curentArenaId || !this.sdk.data.player.id.value) return;
 
+    console.log("any  -  Damage");
+
     const playersID = this.getPlayersIds();
     for (const playerId of playersID) {
       if (onDamageData.attacker.playerId === playerId && playerId !== this.sdk.data.player.id.value) {
@@ -411,31 +413,25 @@ class CoreService {
   handlePlayerFeedback(feedback) {
     if (!feedback || !feedback.type) return;
 
-    switch (feedback.type) {
-      case 'damage':
-        this.handlePlayerDamage(feedback.data);
-        break;
-      case 'kill':
-        this.handlePlayerKill(feedback.data);
-        break;
-      case 'radioAssist':
-        this.handlePlayerRadioAssist(feedback.data);
-        break;
-      case 'trackAssist':
-        this.handlePlayerTrackAssist(feedback.data);
-        break;
-      case 'tanking':
-        this.handlePlayerTanking(feedback.data);
-        break;
-      case 'receivedDamage':
-        this.handlePlayerReceivedDamage(feedback.data);
-        break;
+    if (feedback.type === 'damage') {
+      this.handlePlayerDamage(feedback.data);
+    } else if (feedback.type === 'kill') {
+      this.handlePlayerKill(feedback.data);
+    } else if (feedback.type === 'radioAssist') {
+      this.handlePlayerRadioAssist(feedback.data);
+    } else if (feedback.type === 'trackAssist') {
+      this.handlePlayerTrackAssist(feedback.data);
+    } else if (feedback.type === 'tanking') {
+      this.handlePlayerTanking(feedback.data);
+    } else if (feedback.type === 'receivedDamage') {
+      this.handlePlayerReceivedDamage(feedback.data);
     }
   }
 
   handlePlayerDamage(damageData) {
     if (!damageData || !this.curentArenaId || !this.curentPlayerId) return;
 
+    console.log("handlePlayerDamage");
     const arenaId = this.curentArenaId;
     const playerId = this.curentPlayerId;
 
