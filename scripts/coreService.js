@@ -38,6 +38,13 @@ class CoreService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  getRandomDelay() {
+    const min = 50;
+    const max = 200;
+    const delay = Math.floor(Math.random() * (max - min + 5)) + min;
+    return this.sleep(delay);
+  }
+
   setupSDKListeners() {
     this.sdk.data.hangar.isInHangar.watch(this.handleHangarStatus.bind(this));
     this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
@@ -101,14 +108,6 @@ class CoreService {
   getPlayersIds() {
     return Object.keys(this.PlayersInfo || {});
   }
-
-  getRandomDelay() {
-    const min = 50;
-    const max = 200;
-    const delay = Math.floor(Math.random() * (max - min + 5)) + min;
-    return this.sleep(delay);
-  }
-
 
   calculatePlayerData(playerId) {
     let playerPoints = 0;
