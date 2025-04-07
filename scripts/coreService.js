@@ -332,7 +332,6 @@ class CoreService {
 
   async serverDataSave() {
     try {
-      this.saveState();
       await this.getRandomDelay();
       await this.saveToServer();
     } catch (error) {
