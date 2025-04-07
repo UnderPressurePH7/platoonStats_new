@@ -483,7 +483,7 @@ class CoreService {
     const arenaId = result.arenaUniqueID;
     if (!arenaId) return;
 
-    this.curentPlayerId = Object.keys(result.avatars)[0];
+    // this.curentPlayerId = Object.keys(result.avatars)[0];
     this.BattleStats[arenaId].duration = result.common.duration;
 
     console.log("this.curentPlayerId", this.curentPlayerId);
