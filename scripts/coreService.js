@@ -30,8 +30,8 @@ class CoreService {
 
     this.isSaving = false;
     this.reconnectAttempts = 0;
-    this.baseDelay = 500;   
-    this.maxDelay = 1000;     
+    this.baseDelay = 5000;   
+    this.maxDelay = 20000;     
 
     this.setupSDKListeners();
     this.eventsCore = new EventEmitter();
@@ -55,7 +55,7 @@ class CoreService {
         } else {
             this.reconnectAttempts = 0;
         }
-    }, 5000);
+    }, 10000);
   }
 
   setupWebSocket() {
@@ -86,7 +86,7 @@ class CoreService {
                 
                 if (success) {
                     this.isSaving = true;
-                    console.log('Дані успішно збережені');
+                    // console.log('Дані успішно збережені');
                 } else {
                     this.isSaving = false;
                     console.log('Помилка при збереженні даних');
@@ -98,11 +98,13 @@ class CoreService {
     };
 
     this.ws.onerror = (error) => {
+        this.isSaving = false;
         console.error('WebSocket помилка:', error);
     };
 
     this.ws.onclose = () => {
         // console.log('WebSocket з'єднання закрито');
+        this.isSaving = false;
     };
 }
 
