@@ -436,7 +436,7 @@ class CoreService {
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
     this.serverDataSave();
-    this.sleep(200);
+    this.sleep(500);
     this.serverDataLoad();
 
   }
@@ -460,7 +460,9 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverData();
+    this.serverDataSave();
+    this.sleep(100);
+    this.serverDataLoad();
 
   }
 
@@ -523,7 +525,7 @@ class CoreService {
 
   handlePlayerRadioAssist(radioAssist) {
     if (!radioAssist || !this.curentArenaId || !this.curentPlayerId) return;
-    
+
     this.serverDataLoad();
 
   }
