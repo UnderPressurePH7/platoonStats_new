@@ -121,7 +121,7 @@ class CoreService {
     this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
     this.sdk.data.platoon.isInPlatoon.watch(this.handlePlatoonStatus.bind(this));
     this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
-    this.sdk.data.battle.isAlive.watch(this.handleisAliveStatus.bind(this));
+    //this.sdk.data.battle.isAlive.watch(this.handleisAliveStatus.bind(this));
     this.sdk.data.battle.onDamage.watch(this.handleOnAnyDamage.bind(this));
     this.sdk.data.battle.onPlayerFeedback.watch(this.handlePlayerFeedback.bind(this));
     this.sdk.data.battle.onBattleResult.watch(this.handleBattleResult.bind(this));
@@ -321,6 +321,7 @@ class CoreService {
       throw error;
     }
   }
+
   async loadFromServerOtherPlayers() {
     try {
       const accessKey = this.getAccessKey();
@@ -381,6 +382,27 @@ class CoreService {
 
     } catch (error) {
       console.error('Помилка при очищенні даних на сервері:', error);
+      throw error;
+    }
+  }
+
+  async warmupServer() {
+    try {
+     
+      const response = await fetch(`${atob(STATS.STATUS)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Помилка при завантаженні даних із сервера:', error);
       throw error;
     }
   }
@@ -607,7 +629,8 @@ class CoreService {
         }
       }
     }
-
+    this.warmupServer();
+    this.saveState();
     this.serverDataSave();
     this.sleep(1500);
     this.serverDataLoad();
