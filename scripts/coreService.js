@@ -28,7 +28,7 @@ class CoreService {
       this.isInPlatoon = false;
     }
 
-    this.isSaving = false;
+    // this.isSaving = false;
     this.reconnectAttempts = 0;
     this.baseDelay = 5000;   
     this.maxDelay = 20000;     
@@ -97,7 +97,7 @@ class CoreService {
     };
 
     this.ws.onerror = (error) => {
-        this.isSaving = false;
+        // this.isSaving = false;
         console.error('WebSocket помилка:', error);
     };
 
@@ -247,7 +247,7 @@ class CoreService {
       throw new Error('Access key not found');
     }
 
-    this.isSaving = false;
+    // this.isSaving = false;
 
     for (let i = 0; i < retries; i++) {
       try {
@@ -273,7 +273,7 @@ class CoreService {
           throw new Error(`Server error: ${response.status}`);
         }
         
-        this.isSaving = true;
+
         return true;
 
       } catch (error) {
@@ -297,6 +297,42 @@ class CoreService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.BattleStats) {
+          this.BattleStats = data.BattleStats;
+        }
+        if (data.PlayerInfo) {
+          this.PlayersInfo = data.PlayerInfo;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error('Помилка при завантаженні даних із сервера:', error);
+      throw error;
+    }
+  }
+
+  async loadFromServerOtherPlayers() {
+    try {
+      const accessKey = this.getAccessKey();
+      if (!accessKey) {
+        throw new Error('Access key not found');
+      }
+
+      const response = await fetch(`${atob(STATS.BATTLE)}pid/${accessKey}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Player-ID': this.curentPlayerId
         },
       });
 
@@ -350,15 +386,10 @@ class CoreService {
 
   async serverDataLoad() {
     try {
-      if (!this.isSaving) return;
-
-      const isLoaded = await this.loadFromServer();
+      const isLoaded = await this.loadFromServerOtherPlayers();
         if (!isLoaded) {
             return false;
         }
-      this.sleep(30);
-      this.eventsCore.emit('statsUpdated');
-      this.saveState();
     } catch (error) {
       console.error('Error in serverDataLoad:', error);
     }
@@ -379,9 +410,8 @@ class CoreService {
   async serverData() {
     try {
       await this.saveToServer();
-      this.sleep(500);
-      if (!this.isSaving) return;
-      await this.loadFromServer();
+      this.sleep(100);
+      await this.loadFromServerOtherPlayers();
       this.sleep(30);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
@@ -411,6 +441,9 @@ class CoreService {
     this.serverDataSave();
     this.sleep(300);
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
 
   }
 
@@ -436,6 +469,9 @@ class CoreService {
     this.serverDataSave();
     this.sleep(300);
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
   }
 
   handleOnAnyDamage(onDamageData) {
@@ -448,6 +484,9 @@ class CoreService {
       if (onDamageData.attacker.playerId === parseInt(playerId) && parseInt(playerId) !== this.sdk.data.player.id.value) {
 
         this.serverDataLoad();
+        this.sleep(30);
+        this.eventsCore.emit('statsUpdated');
+        this.saveState();
         break;
       }
     }
@@ -480,9 +519,10 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * GAME_POINTS.POINTS_PER_DAMAGE;
 
-    this.serverDataSave();
-    this.sleep(300);
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
   }
 
   handlePlayerKill(killData) {
@@ -494,29 +534,42 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].kills += 1;
     this.BattleStats[arenaId].players[playerId].points += GAME_POINTS.POINTS_PER_FRAG;
 
-    this.serverDataSave();
-    this.sleep(300);
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
   }
 
   handlePlayerRadioAssist(radioAssist) {
     if (!radioAssist || !this.curentArenaId || !this.curentPlayerId) return;
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
   }
 
   handlePlayerTrackAssist(trackAssist) {
     if (!trackAssist || !this.curentArenaId || !this.curentPlayerId) return;
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
   }
 
   handlePlayerTanking(tanking) {
     if (!tanking || !this.curentArenaId || !this.curentPlayerId) return;
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
   }
 
   handlePlayerReceivedDamage(receivedDamage) {
     if (!receivedDamage || !this.curentArenaId || !this.curentPlayerId) return;
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
   }
 
   handleBattleResult(result) {
@@ -562,6 +615,9 @@ class CoreService {
     this.serverDataSave();
     this.sleep(1500);
     this.serverDataLoad();
+    this.sleep(30);
+    this.eventsCore.emit('statsUpdated');
+    this.saveState();
 
   }
 
