@@ -238,7 +238,7 @@ class CoreService {
     return localStorage.getItem('accessKey');
   }
 
-  async saveToServer(retries = 2) {
+  async saveToServer(retries = 3) {
     const accessKey = this.getAccessKey();
     if (!accessKey) {
       throw new Error('Access key not found');
@@ -248,7 +248,7 @@ class CoreService {
     for (let i = 0; i < retries; i++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
           method: 'POST',
