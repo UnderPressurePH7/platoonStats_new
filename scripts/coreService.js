@@ -561,6 +561,8 @@ class CoreService {
       this.handlePlayerTanking(feedback.data);
     } else if (feedback.type === 'receivedDamage') {
       this.handlePlayerReceivedDamage(feedback.data);
+    } else if (feedback.type === 'targetVisibility') {
+      this.handlePlayerTargetVisibility(feedback.data);
     }
   }
 
@@ -614,6 +616,12 @@ class CoreService {
 
     this.serverDataLoadOtherPlayers();
 
+  }
+
+  // тестова фігня
+  handlePlayerTargetVisibility(targetVisibility) {
+    if (!this.curentArenaId || !this.curentPlayerId) return;
+    this.serverDataLoadOtherPlayers();
   }
 
   handleBattleResult(result) {
