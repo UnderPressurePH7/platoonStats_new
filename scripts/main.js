@@ -19,7 +19,7 @@ export default class SquadWidget {
       
       }
       this.initializeServices();
-      await this.warmupServer();
+      // await this.warmupServer();
     } catch (error) {
       console.error('Error in init:', error);
       this.showAccessDenied();
