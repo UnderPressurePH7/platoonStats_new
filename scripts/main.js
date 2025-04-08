@@ -12,13 +12,14 @@ export default class SquadWidget {
 
 
       const hasAccess = await this.checkAccessKey();
-      await this.warmupServer();
+      
       if (!hasAccess) {
         this.showAccessDenied();
         return;
       
       }
       this.initializeServices();
+      await this.warmupServer();
     } catch (error) {
       console.error('Error in init:', error);
       this.showAccessDenied();
