@@ -86,7 +86,7 @@ class CoreService {
                 
                 if (success) {
                     // this.isSaving = true;
-                    // console.log('Дані успішно збережені');
+                    console.log('Дані успішно збережені');
                 } else {
                     console.log('Помилка при збереженні даних');
                 }
