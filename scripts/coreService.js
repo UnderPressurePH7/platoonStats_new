@@ -664,6 +664,7 @@ class CoreService {
     }
     this.warmupServer();
     this.saveState();
+    this.getRandomDelay(); // тест
     this.serverDataSave();
 
     if (arenaId === this.curentArenaId) {
