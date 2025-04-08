@@ -121,6 +121,7 @@ class CoreService {
     this.sdk.data.hangar.vehicle.info.watch(this.handleHangarVehicle.bind(this));
     this.sdk.data.platoon.isInPlatoon.watch(this.handlePlatoonStatus.bind(this));
     this.sdk.data.battle.arena.watch(this.handleArena.bind(this));
+    this.sdk.data.battle.isAlive.watch(this.handleisAliveStatus.bind(this));
     this.sdk.data.battle.onDamage.watch(this.handleOnAnyDamage.bind(this));
     this.sdk.data.battle.onPlayerFeedback.watch(this.handlePlayerFeedback.bind(this));
     this.sdk.data.battle.onBattleResult.watch(this.handleBattleResult.bind(this));
@@ -485,10 +486,17 @@ class CoreService {
     for (const playerId of playersID) {
       if (onDamageData.attacker.playerId === parseInt(playerId) && parseInt(playerId) !== this.sdk.data.player.id.value) {
 
-        this.serverData();
+        this.serverDataLoadOtherPlayers();
         break;
       }
     }
+  }
+
+  handleisAliveStatus(isAlive) {
+    if (isAlive || !this.curentArenaId) return;
+
+    this.serverDataLoadOtherPlayers();
+
   }
 
   handlePlayerFeedback(feedback) {
