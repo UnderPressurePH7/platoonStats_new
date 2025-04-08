@@ -85,10 +85,9 @@ class CoreService {
                 const success = view[0] === 1;
                 
                 if (success) {
-                    this.isSaving = true;
+                    // this.isSaving = true;
                     // console.log('Дані успішно збережені');
                 } else {
-                    this.isSaving = false;
                     console.log('Помилка при збереженні даних');
                 }
             }
@@ -104,7 +103,6 @@ class CoreService {
 
     this.ws.onclose = () => {
         // console.log('WebSocket з'єднання закрито');
-        this.isSaving = false;
     };
 }
 
@@ -274,7 +272,8 @@ class CoreService {
         if (!response.ok && response.status !== 202) {
           throw new Error(`Server error: ${response.status}`);
         }
-
+        
+        this.isSaving = true;
         return true;
 
       } catch (error) {
