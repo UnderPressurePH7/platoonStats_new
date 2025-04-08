@@ -435,7 +435,9 @@ class CoreService {
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-    this.serverData();
+    this.serverDataSave();
+    this.sleep(200);
+    this.serverDataLoad();
 
   }
 
@@ -521,10 +523,9 @@ class CoreService {
 
   handlePlayerRadioAssist(radioAssist) {
     if (!radioAssist || !this.curentArenaId || !this.curentPlayerId) return;
+    
     this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+
   }
 
   handlePlayerTrackAssist(trackAssist) {
