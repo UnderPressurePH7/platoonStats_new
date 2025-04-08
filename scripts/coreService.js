@@ -386,10 +386,11 @@ class CoreService {
 
   async serverDataLoad() {
     try {
-      const isLoaded = await this.loadFromServerOtherPlayers();
-        if (!isLoaded) {
-            return false;
-        }
+      await this.loadFromServer();
+      this.eventsCore.emit('statsUpdated');
+      this.sleep(50);
+      this.saveState();
+
     } catch (error) {
       console.error('Error in serverDataLoad:', error);
     }
@@ -397,11 +398,7 @@ class CoreService {
 
   async serverDataSave() {
     try {
-
-      const isSaved =  await this.saveToServer();
-      if (!isSaved) {
-          return false;
-      }
+      await this.saveToServer();
     } catch (error) {
       console.error('Error in serverDataSave:', error);
     }
@@ -412,8 +409,8 @@ class CoreService {
       await this.saveToServer();
       this.sleep(100);
       await this.loadFromServerOtherPlayers();
-      this.sleep(30);
       this.eventsCore.emit('statsUpdated');
+      this.sleep(50);
       this.saveState();
     } catch (error) {
       console.error('Error in serverData:', error);
@@ -466,12 +463,8 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverDataSave();
-    this.sleep(300);
-    this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+    this.serverData();
+
   }
 
   handleOnAnyDamage(onDamageData) {
@@ -483,10 +476,7 @@ class CoreService {
     for (const playerId of playersID) {
       if (onDamageData.attacker.playerId === parseInt(playerId) && parseInt(playerId) !== this.sdk.data.player.id.value) {
 
-        this.serverDataLoad();
-        this.sleep(30);
-        this.eventsCore.emit('statsUpdated');
-        this.saveState();
+        this.serverData();
         break;
       }
     }
@@ -519,10 +509,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].damage += damageData.damage;
     this.BattleStats[arenaId].players[playerId].points += damageData.damage * GAME_POINTS.POINTS_PER_DAMAGE;
 
-    this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+    this.serverData();
   }
 
   handlePlayerKill(killData) {
@@ -534,10 +521,7 @@ class CoreService {
     this.BattleStats[arenaId].players[playerId].kills += 1;
     this.BattleStats[arenaId].players[playerId].points += GAME_POINTS.POINTS_PER_FRAG;
 
-    this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+    this.serverData();
   }
 
   handlePlayerRadioAssist(radioAssist) {
@@ -550,26 +534,23 @@ class CoreService {
 
   handlePlayerTrackAssist(trackAssist) {
     if (!trackAssist || !this.curentArenaId || !this.curentPlayerId) return;
+
     this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+
   }
 
   handlePlayerTanking(tanking) {
     if (!tanking || !this.curentArenaId || !this.curentPlayerId) return;
+
     this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+
   }
 
   handlePlayerReceivedDamage(receivedDamage) {
     if (!receivedDamage || !this.curentArenaId || !this.curentPlayerId) return;
+    
     this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+
   }
 
   handleBattleResult(result) {
@@ -611,14 +592,10 @@ class CoreService {
       }
     }
 
-    this.getRandomDelay();
+
     this.serverDataSave();
     this.sleep(1500);
     this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
-
   }
 
   cleanup() {
