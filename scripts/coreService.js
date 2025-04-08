@@ -325,7 +325,7 @@ class CoreService {
   async clearServerData() {
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${atob(STATS.BATTLE)}clear/${accessKey}`, {
+      const response = await fetch(`${atob(STATS.BATTLE)}clear//${accessKey}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
