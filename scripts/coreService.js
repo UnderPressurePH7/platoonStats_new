@@ -320,7 +320,6 @@ class CoreService {
       throw error;
     }
   }
-
   async loadFromServerOtherPlayers() {
     try {
       const accessKey = this.getAccessKey();
@@ -344,11 +343,12 @@ class CoreService {
 
       if (data.success) {
         if (data.BattleStats) {
-          this.BattleStats = data.BattleStats;
+          this.BattleStats = {
+            ...this.BattleStats,  
+            ...data.BattleStats   
+          };
         }
-        if (data.PlayerInfo) {
-          this.PlayersInfo = data.PlayerInfo;
-        }
+              
       }
       return true;
     } catch (error) {
@@ -460,9 +460,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].vehicle = this.curentVehicle;
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
-    this.serverDataSave();
-    this.sleep(500);
-    this.serverDataLoad();
+    this.serverData();
 
   }
 
