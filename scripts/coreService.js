@@ -436,7 +436,7 @@ class CoreService {
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
     this.serverDataSave();
-    this.sleep(500);
+    this.sleep(750);
     this.serverDataLoad();
 
   }
@@ -461,7 +461,7 @@ class CoreService {
     this.BattleStats[this.curentArenaId].players[this.curentPlayerId].name = this.sdk.data.player.name.value;
 
     this.serverDataSave();
-    this.sleep(100);
+    this.sleep(500);
     this.serverDataLoad();
 
   }
