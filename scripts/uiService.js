@@ -7,8 +7,6 @@ class UIService {
     });
 
     this.setupEventListeners();
-
-
   }
 
   updatePlayersUI() {
