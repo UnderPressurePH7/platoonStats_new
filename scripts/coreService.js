@@ -321,13 +321,14 @@ class CoreService {
     }
   }
 
+
   async loadFromServerOtherPlayers() {
     try {
       const accessKey = this.getAccessKey();
       if (!accessKey) {
         throw new Error('Access key not found');
       }
-
+  
       const response = await fetch(`${atob(STATS.BATTLE)}pid/${accessKey}`, {
         method: 'GET',
         headers: {
@@ -335,28 +336,108 @@ class CoreService {
           'X-Player-ID': this.curentPlayerId
         },
       });
-
+  
       if (!response.ok) {
         throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
       }
-
+  
       const data = await response.json();
-
-      if (data.success) {
-        if (data.BattleStats) {
-          this.BattleStats = {
-            ...this.BattleStats,  
-            ...data.BattleStats   
-          };
-        }
-              
+  
+      if (data.success && !data.BattleStats) {
+        return true;
       }
-      return true;
+  
+      if (data.success && data.BattleStats) {
+        Object.entries(data.BattleStats).forEach(([battleId, newBattleData]) => {
+          const existingBattle = this.BattleStats[battleId];
+  
+          if (existingBattle) {
+            this.BattleStats[battleId] = {
+              ...existingBattle,
+              startTime: newBattleData.startTime,
+              duration: newBattleData.duration,
+              win: newBattleData.win,
+              mapName: newBattleData.mapName,
+              players: { ...existingBattle.players }
+            };
+  
+            Object.entries(newBattleData.players).forEach(([playerId, newPlayerData]) => {
+              const existingPlayer = existingBattle.players[playerId];
+  
+              if (existingPlayer) {
+                this.BattleStats[battleId].players[playerId] = {
+                  name: newPlayerData.name, 
+                  vehicle: newPlayerData.vehicle,
+                  damage: Math.max(existingPlayer.damage || 0, newPlayerData.damage || 0),
+                  kills: Math.max(existingPlayer.kills || 0, newPlayerData.kills || 0),
+                  points: Math.max(existingPlayer.points || 0, newPlayerData.points || 0)
+                };
+
+                if (existingPlayer.damage !== this.BattleStats[battleId].players[playerId].damage ||
+                    existingPlayer.kills !== this.BattleStats[battleId].players[playerId].kills ||
+                    existingPlayer.points !== this.BattleStats[battleId].players[playerId].points) {
+                  // console.log(`Оновлено дані гравця ${playerId} в битві ${battleId}:`, {
+                  //   damage: `${existingPlayer.damage} -> ${this.BattleStats[battleId].players[playerId].damage}`,
+                  //   kills: `${existingPlayer.kills} -> ${this.BattleStats[battleId].players[playerId].kills}`,
+                  //   points: `${existingPlayer.points} -> ${this.BattleStats[battleId].players[playerId].points}`
+                  // });
+                }
+              } else {
+                this.BattleStats[battleId].players[playerId] = newPlayerData;
+              
+              }
+            });
+          } else {
+
+            this.BattleStats[battleId] = newBattleData;
+          }
+        });
+  
+        return true;
+      }
+  
+      return false;
     } catch (error) {
       console.error('Помилка при завантаженні даних із сервера:', error);
       throw error;
     }
   }
+  // async loadFromServerOtherPlayers() {
+  //   try {
+  //     const accessKey = this.getAccessKey();
+  //     if (!accessKey) {
+  //       throw new Error('Access key not found');
+  //     }
+
+  //     const response = await fetch(`${atob(STATS.BATTLE)}pid/${accessKey}`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'X-Player-ID': this.curentPlayerId
+  //       },
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+  //     }
+
+  //     const data = await response.json();
+
+  //     if (data.success) {
+  //       if (data.BattleStats) {
+  //         this.BattleStats = {
+  //           ...this.BattleStats,  
+  //           ...data.BattleStats   
+  //         };
+  //       }
+              
+  //     }
+  //     return true;
+  //   } catch (error) {
+  //     console.error('Помилка при завантаженні даних із сервера:', error);
+  //     throw error;
+  //   }
+  // }
 
   async clearServerData() {
     try {
@@ -441,7 +522,7 @@ class CoreService {
   serverData() {
     try {
       this.saveToServer();
-      this.sleep(100);
+      this.sleep(250);
       this.loadFromServerOtherPlayers();
       this.sleep(50);
       this.eventsCore.emit('statsUpdated');
