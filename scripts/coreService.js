@@ -396,6 +396,18 @@ class CoreService {
     }
   }
 
+  serverDataLoadOtherPlayers() {
+    try {
+      this.loadFromServerOtherPlayers();
+      this.eventsCore.emit('statsUpdated');
+      this.sleep(50);
+      this.saveState();
+
+    } catch (error) {
+      console.error('Error in serverDataLoad:', error);
+    }
+  }
+
   serverDataSave() {
     try {
       this.saveToServer();
@@ -524,28 +536,28 @@ class CoreService {
   handlePlayerRadioAssist(radioAssist) {
     if (!radioAssist || !this.curentArenaId || !this.curentPlayerId) return;
 
-    this.serverDataLoad();
+    this.serverDataLoadOtherPlayers();
 
   }
 
   handlePlayerTrackAssist(trackAssist) {
     if (!trackAssist || !this.curentArenaId || !this.curentPlayerId) return;
 
-    this.serverDataLoad();
+    this.serverDataLoadOtherPlayers();
 
   }
 
   handlePlayerTanking(tanking) {
     if (!tanking || !this.curentArenaId || !this.curentPlayerId) return;
 
-    this.serverDataLoad();
+    this.serverDataLoadOtherPlayers();
 
   }
 
   handlePlayerReceivedDamage(receivedDamage) {
     if (!receivedDamage || !this.curentArenaId || !this.curentPlayerId) return;
 
-    this.serverDataLoad();
+    this.serverDataLoadOtherPlayers();
 
   }
 
