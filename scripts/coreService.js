@@ -28,7 +28,6 @@ class CoreService {
       this.isInPlatoon = false;
     }
 
-    // this.isSaving = false;
     this.reconnectAttempts = 0;
     this.baseDelay = 5000;   
     this.maxDelay = 20000;     
@@ -85,7 +84,6 @@ class CoreService {
                 const success = view[0] === 1;
                 
                 if (success) {
-                    // this.isSaving = true;
                     console.log('Дані успішно збережені');
                 } else {
                     console.log('Помилка при збереженні даних');
@@ -97,7 +95,6 @@ class CoreService {
     };
 
     this.ws.onerror = (error) => {
-        // this.isSaving = false;
         console.error('WebSocket помилка:', error);
     };
 
@@ -247,12 +244,11 @@ class CoreService {
       throw new Error('Access key not found');
     }
 
-    // this.isSaving = false;
 
     for (let i = 0; i < retries; i++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1500);
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
         const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
           method: 'POST',
