@@ -470,7 +470,8 @@ class CoreService {
 
   serverDataLoadOtherPlayers() {
     try {
-      this.loadFromServerOtherPlayers();
+      // this.loadFromServerOtherPlayers(); // бага
+      this.loadFromServer();
       this.sleep(50);
       this.eventsCore.emit('statsUpdated');
       this.saveState();
