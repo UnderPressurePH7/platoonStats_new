@@ -131,47 +131,33 @@ class BattleDataManager {
     }
   }
 
+
   async loadFromServer() {
     try {
       const accessKey = this.getAccessKey();
       if (!accessKey) {
         throw new Error('Access key not found');
       }
-  
+
       const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-  
+
       if (!response.ok) {
         throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         if (data.BattleStats) {
-          if (this.BattleStats) {
-            this.BattleStats = {
-              ...this.BattleStats,
-              ...data.BattleStats
-            };
-          } else {
-            this.BattleStats = data.BattleStats;
-          }
+          this.BattleStats = data.BattleStats;
         }
-        
         if (data.PlayerInfo) {
-          if (this.PlayersInfo) {
-            this.PlayersInfo = {
-              ...this.PlayersInfo,
-              ...data.PlayerInfo
-            };
-          } else {
-            this.PlayersInfo = data.PlayerInfo;
-          }
+          this.PlayersInfo = data.PlayerInfo;
         }
       }
       return true;
@@ -180,6 +166,56 @@ class BattleDataManager {
       throw error;
     }
   }
+
+  // async loadFromServer() {
+  //   try {
+  //     const accessKey = this.getAccessKey();
+  //     if (!accessKey) {
+  //       throw new Error('Access key not found');
+  //     }
+  
+  //     const response = await fetch(`${atob(STATS.BATTLE)}${accessKey}`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+  
+  //     if (!response.ok) {
+  //       throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
+  //     }
+  
+  //     const data = await response.json();
+  
+  //     if (data.success) {
+  //       if (data.BattleStats) {
+  //         if (this.BattleStats) {
+  //           this.BattleStats = {
+  //             ...this.BattleStats,
+  //             ...data.BattleStats
+  //           };
+  //         } else {
+  //           this.BattleStats = data.BattleStats;
+  //         }
+  //       }
+        
+  //       if (data.PlayerInfo) {
+  //         if (this.PlayersInfo) {
+  //           this.PlayersInfo = {
+  //             ...this.PlayersInfo,
+  //             ...data.PlayerInfo
+  //           };
+  //         } else {
+  //           this.PlayersInfo = data.PlayerInfo;
+  //         }
+  //       }
+  //     }
+  //     return true;
+  //   } catch (error) {
+  //     console.error('Помилка при завантаженні даних із сервера:', error);
+  //     throw error;
+  //   }
+  // }
 
 
   async deleteBattle(battleId) {
