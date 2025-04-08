@@ -108,47 +108,6 @@ class CoreService {
     };
 }
 
-
-  // setupWebSocket() {
-  //   const accessKey = this.getAccessKey();
-  //   if (!accessKey || !this.curentPlayerId) {
-  //       return;
-  //   }
-
-  //   const baseUrl = atob(STATS.WS);
-  //   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  //   const wsUrl = `${wsProtocol}//${baseUrl}?playerId=${this.curentPlayerId}`;
-
-  //   if (this.ws) {
-  //       this.ws.close();
-  //   }
-
-  //   this.ws = new WebSocket(wsUrl);
-
-  //   this.ws.onopen = () => {
-  //       this.reconnectAttempts = 0; 
-  //   };
-
-  //   this.ws.onmessage = (event) => {
-  //     try {
-  //       const data = JSON.parse(event.data);
-  //       if (data.success) {
-  //         this.isSaving = true;
-  //       }
-  //     } catch (error) {
-  //       console.error('Помилка обробки WebSocket повідомлення:', error);
-  //     }
-  //   };
-
-  //   this.ws.onerror = (error) => {
-  //     console.error('WebSocket помилка:', error);
-  //   };
-
-  //   this.ws.onclose = () => {
-
-  //   };
-  // }
-
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
