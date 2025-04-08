@@ -106,7 +106,7 @@ class BattleDataManager {
 
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${atob(STATS.IMPORT)}${accessKey}`, {
+      const response = await fetch(`${atob(STATS.BATTLE)}import/${accessKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

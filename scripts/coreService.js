@@ -60,9 +60,7 @@ class CoreService {
 
   setupWebSocket() {
     const accessKey = this.getAccessKey();
-    if (!accessKey || !this.curentPlayerId) {
-        return;
-    }
+    if (!accessKey || !this.curentPlayerId) return;
 
     const baseUrl = atob(STATS.WS);
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -73,30 +71,81 @@ class CoreService {
     }
 
     this.ws = new WebSocket(wsUrl);
+    
+    this.ws.binaryType = 'arraybuffer';
 
     this.ws.onopen = () => {
-        this.reconnectAttempts = 0; 
+        this.reconnectAttempts = 0;
     };
 
     this.ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.success) {
-          this.isSaving = true;
+        try {
+            if (event.data instanceof ArrayBuffer) {
+                const view = new Uint8Array(event.data);
+                const success = view[0] === 1;
+                
+                if (success) {
+                    this.isSaving = true;
+                    console.log('Дані успішно збережені');
+                } else {
+                    this.isSaving = false;
+                    console.log('Помилка при збереженні даних');
+                }
+            }
+        } catch (error) {
+            console.error('Помилка обробки WebSocket повідомлення:', error);
         }
-      } catch (error) {
-        console.error('Помилка обробки WebSocket повідомлення:', error);
-      }
     };
 
     this.ws.onerror = (error) => {
-      console.error('WebSocket помилка:', error);
+        console.error('WebSocket помилка:', error);
     };
 
     this.ws.onclose = () => {
-
+        // console.log('WebSocket з'єднання закрито');
     };
-  }
+}
+
+
+  // setupWebSocket() {
+  //   const accessKey = this.getAccessKey();
+  //   if (!accessKey || !this.curentPlayerId) {
+  //       return;
+  //   }
+
+  //   const baseUrl = atob(STATS.WS);
+  //   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  //   const wsUrl = `${wsProtocol}//${baseUrl}?playerId=${this.curentPlayerId}`;
+
+  //   if (this.ws) {
+  //       this.ws.close();
+  //   }
+
+  //   this.ws = new WebSocket(wsUrl);
+
+  //   this.ws.onopen = () => {
+  //       this.reconnectAttempts = 0; 
+  //   };
+
+  //   this.ws.onmessage = (event) => {
+  //     try {
+  //       const data = JSON.parse(event.data);
+  //       if (data.success) {
+  //         this.isSaving = true;
+  //       }
+  //     } catch (error) {
+  //       console.error('Помилка обробки WebSocket повідомлення:', error);
+  //     }
+  //   };
+
+  //   this.ws.onerror = (error) => {
+  //     console.error('WebSocket помилка:', error);
+  //   };
+
+  //   this.ws.onclose = () => {
+
+  //   };
+  // }
 
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -228,6 +277,7 @@ class CoreService {
     return { teamPoints, teamDamage, teamKills, wins, battles };
   }
 
+
   getAccessKey() {
     return localStorage.getItem('accessKey');
   }
@@ -314,7 +364,7 @@ class CoreService {
   async clearServerData() {
     try {
       const accessKey = this.getAccessKey();
-      const response = await fetch(`${atob(STATS.CLEAR)}${accessKey}`, {
+      const response = await fetch(`${atob(STATS.BATTLE)}clear/${accessKey}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
