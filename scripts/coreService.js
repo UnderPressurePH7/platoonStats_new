@@ -400,8 +400,8 @@ class CoreService {
   serverDataLoadOtherPlayers() {
     try {
       this.loadFromServerOtherPlayers();
-      this.eventsCore.emit('statsUpdated');
       this.sleep(50);
+      this.eventsCore.emit('statsUpdated');
       this.saveState();
 
     } catch (error) {
@@ -422,8 +422,8 @@ class CoreService {
       this.saveToServer();
       this.sleep(100);
       this.loadFromServerOtherPlayers();
-      this.eventsCore.emit('statsUpdated');
       this.sleep(50);
+      this.eventsCore.emit('statsUpdated');
       this.saveState();
     } catch (error) {
       console.error('Error in serverData:', error);
@@ -607,7 +607,6 @@ class CoreService {
         }
       }
     }
-
 
     this.serverDataSave();
     this.sleep(1500);
