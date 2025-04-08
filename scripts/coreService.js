@@ -661,8 +661,12 @@ class CoreService {
     this.warmupServer();
     this.saveState();
     this.serverDataSave();
-    this.sleep(1500);
-    this.serverDataLoad();
+
+    if (arenaId === this.curentArenaId) {
+      this.sleep(1500);
+      this.serverDataLoad();
+    }
+    
   }
 
   cleanup() {
