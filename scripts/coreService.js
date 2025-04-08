@@ -372,16 +372,6 @@ class CoreService {
                   kills: Math.max(existingPlayer.kills || 0, newPlayerData.kills || 0),
                   points: Math.max(existingPlayer.points || 0, newPlayerData.points || 0)
                 };
-
-                if (existingPlayer.damage !== this.BattleStats[battleId].players[playerId].damage ||
-                    existingPlayer.kills !== this.BattleStats[battleId].players[playerId].kills ||
-                    existingPlayer.points !== this.BattleStats[battleId].players[playerId].points) {
-                  // console.log(`Оновлено дані гравця ${playerId} в битві ${battleId}:`, {
-                  //   damage: `${existingPlayer.damage} -> ${this.BattleStats[battleId].players[playerId].damage}`,
-                  //   kills: `${existingPlayer.kills} -> ${this.BattleStats[battleId].players[playerId].kills}`,
-                  //   points: `${existingPlayer.points} -> ${this.BattleStats[battleId].players[playerId].points}`
-                  // });
-                }
               } else {
                 this.BattleStats[battleId].players[playerId] = newPlayerData;
               
@@ -402,42 +392,7 @@ class CoreService {
       throw error;
     }
   }
-  // async loadFromServerOtherPlayers() {
-  //   try {
-  //     const accessKey = this.getAccessKey();
-  //     if (!accessKey) {
-  //       throw new Error('Access key not found');
-  //     }
-
-  //     const response = await fetch(`${atob(STATS.BATTLE)}pid/${accessKey}`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'X-Player-ID': this.curentPlayerId
-  //       },
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(`Помилка при завантаженні даних: ${response.statusText}`);
-  //     }
-
-  //     const data = await response.json();
-
-  //     if (data.success) {
-  //       if (data.BattleStats) {
-  //         this.BattleStats = {
-  //           ...this.BattleStats,  
-  //           ...data.BattleStats   
-  //         };
-  //       }
-              
-  //     }
-  //     return true;
-  //   } catch (error) {
-  //     console.error('Помилка при завантаженні даних із сервера:', error);
-  //     throw error;
-  //   }
-  // }
+  
 
   async clearServerData() {
     try {
