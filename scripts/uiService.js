@@ -1,12 +1,14 @@
 class UIService {
   constructor(coreService) {
     this.core = coreService;
-    this.setupEventListeners();
 
     this.core.eventsCore.on('statsUpdated', () => {
-      console.log('statsUpdated');
       this.updatePlayersUI();
     });
+
+    this.setupEventListeners();
+
+
   }
 
   updatePlayersUI() {
