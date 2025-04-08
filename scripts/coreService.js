@@ -384,9 +384,9 @@ class CoreService {
     }
   }
 
-  async serverDataLoad() {
+  serverDataLoad() {
     try {
-      await this.loadFromServer();
+      this.loadFromServer();
       this.eventsCore.emit('statsUpdated');
       this.sleep(50);
       this.saveState();
@@ -396,19 +396,19 @@ class CoreService {
     }
   }
 
-  async serverDataSave() {
+  serverDataSave() {
     try {
-      await this.saveToServer();
+      this.saveToServer();
     } catch (error) {
       console.error('Error in serverDataSave:', error);
     }
   }
 
-  async serverData() {
+  serverData() {
     try {
-      await this.saveToServer();
+      this.saveToServer();
       this.sleep(100);
-      await this.loadFromServerOtherPlayers();
+      this.loadFromServerOtherPlayers();
       this.eventsCore.emit('statsUpdated');
       this.sleep(50);
       this.saveState();
@@ -435,12 +435,7 @@ class CoreService {
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-    this.serverDataSave();
-    this.sleep(300);
-    this.serverDataLoad();
-    this.sleep(30);
-    this.eventsCore.emit('statsUpdated');
-    this.saveState();
+    this.serverData();
 
   }
 
@@ -548,7 +543,7 @@ class CoreService {
 
   handlePlayerReceivedDamage(receivedDamage) {
     if (!receivedDamage || !this.curentArenaId || !this.curentPlayerId) return;
-    
+
     this.serverDataLoad();
 
   }

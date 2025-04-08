@@ -4,6 +4,7 @@ class UIService {
     this.setupEventListeners();
 
     this.core.eventsCore.on('statsUpdated', () => {
+      console.log('statsUpdated');
       this.updatePlayersUI();
     });
   }
