@@ -379,14 +379,14 @@ class CoreService {
           }
         });
 
-        if (data.PlayerInfo) {
-          Object.entries(data.PlayerInfo).forEach(([playerId, playerName]) => {
-            if (this.PlayersInfo.hasOwnProperty(playerId)) {
-              this.PlayersInfo[playerId] = playerName;
-            } else {
-              this.PlayersInfo[playerId] = playerName;
-            }
-          });
+        // if (data.PlayerInfo) {
+        //   Object.entries(data.PlayerInfo).forEach(([playerId, playerName]) => {
+        //     if (this.PlayersInfo.hasOwnProperty(playerId)) {
+        //       this.PlayersInfo[playerId] = playerName;
+        //     } else {
+        //       this.PlayersInfo[playerId] = playerName;
+        //     }
+        //   });
         }
   
         return true;
