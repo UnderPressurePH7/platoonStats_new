@@ -339,11 +339,11 @@ class CoreService {
   
       const data = await response.json();
   
-      if (data.success && !data.BattleStats) {
+      if (data.success) {
         return true;
       }
   
-      if (data.success && data.BattleStats) {
+      if (data.BattleStats) {
         Object.entries(data.BattleStats).forEach(([battleId, newBattleData]) => {
           const existingBattle = this.BattleStats[battleId];
   
@@ -673,7 +673,7 @@ class CoreService {
     this.saveState();
     this.getRandomDelay(); // тест
     this.serverData();
-    
+
     // this.serverDataSave();
 
     // if (arenaId === this.curentArenaId) {
