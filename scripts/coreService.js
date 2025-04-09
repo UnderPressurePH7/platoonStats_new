@@ -387,7 +387,7 @@ class CoreService {
         //       this.PlayersInfo[playerId] = playerName;
         //     }
         //   });
-        }
+        //  }
   
         return true;
       }
