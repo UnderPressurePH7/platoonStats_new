@@ -378,6 +378,16 @@ class CoreService {
             this.BattleStats[battleId] = newBattleData;
           }
         });
+
+        if (data.PlayerInfo) {
+          Object.entries(data.PlayerInfo).forEach(([playerId, playerName]) => {
+            if (this.PlayersInfo.hasOwnProperty(playerId)) {
+              this.PlayersInfo[playerId] = playerName;
+            } else {
+              this.PlayersInfo[playerId] = playerName;
+            }
+          });
+        }
   
         return true;
       }
@@ -501,10 +511,7 @@ class CoreService {
 
     this.PlayersInfo[this.curentPlayerId] = this.sdk.data.player.name.value;
 
-    this.serverDataSave();
-    this.sleep(750);
-    this.serverDataLoad();
-
+    this.serverData();
   }
 
   handleHangarVehicle(hangareVehicleData) {
@@ -665,12 +672,15 @@ class CoreService {
     this.warmupServer();
     this.saveState();
     this.getRandomDelay(); // тест
-    this.serverDataSave();
+    this.serverData();
+    
+    // this.serverDataSave();
 
-    if (arenaId === this.curentArenaId) {
-      this.sleep(1500);
-      this.serverDataLoad();
-    }
+    // if (arenaId === this.curentArenaId) {
+    //   this.sleep(1500);
+    //   this.serverDataLoadOtherPlayers();
+    //   //this.serverDataLoad();
+    // }
     
   }
 
